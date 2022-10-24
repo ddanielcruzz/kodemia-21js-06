@@ -24,9 +24,21 @@ const initialKoders = [
 function App() {
   const [koders, setKoders] = useState(initialKoders);
   const [newKoderName, setNewKoderName] = useState("");
+  const [error, setError] = useState("");
 
   const addNewKoder = (e) => {
     e.preventDefault();
+    const nameAlreadyExists = koders.some(
+      (koder) => koder.name === newKoderName
+    );
+
+    if (nameAlreadyExists) {
+      setError("Name already in list");
+      return;
+    } else {
+      setError();
+    }
+
     setKoders([...koders, { name: newKoderName }]);
   };
 
@@ -41,6 +53,11 @@ function App() {
 
   return (
     <main className="min-h-screen bg-gray-300">
+      {error && (
+        <article className="mx-auto bg-red-500 text-red-900 w-max p-4 rounded-md">
+          {error}
+        </article>
+      )}
       <div className="flex flex-col items-center text-center space-y-4 pt-10 text-lg w-[400px] mx-auto">
         <form
           onSubmit={(event) => addNewKoder(event)}
@@ -83,7 +100,7 @@ function App() {
         </form>
         <ul className="flex flex-col space-y-5 text-left">
           {koders.map(({ name, email, age, generation }, index) => (
-            <li key={index}>
+            <li key={name}>
               <article className="bg-white rounded-lg shadow px-4 py-3">
                 <section className="flex justify-between">
                   <p>
