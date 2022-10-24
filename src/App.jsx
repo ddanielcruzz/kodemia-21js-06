@@ -24,48 +24,64 @@ const initialKoders = [
 
 function App() {
   const [koders, setKoders] = useState(initialKoders);
-  const [newKoderName, setNewKoderName] = useState("");
-  const [newKoderEmail, setNewKoderEmail] = useState("");
-  // const [newKoderEmailConfirmation, setNewKoderEmailConfirmation] =
-  //   useState("");
   const [error, setError] = useState("");
+
+  const form = {
+    name: {
+      inputName: "name",
+      hasErrors: (value) => {
+        const isEmpty = value === "";
+        const isRepeated = koders.some((koder) => koder.name === value);
+
+        return isEmpty || isRepeated;
+      },
+    },
+    email: {
+      inputName: "email",
+      hasErrors: (value) => {
+        const isEmail = emailRegexPattern.test(value);
+
+        return !isEmail;
+      },
+    },
+    emailConfirmation: {
+      inputName: "email-confirmation",
+      hasErrors: (value, email) => {
+        const doNotMatch = value !== email;
+        return doNotMatch;
+      },
+    },
+  };
 
   const addNewKoder = (e) => {
     e.preventDefault();
-    const nameAlreadyExists = koders.some(
-      (koder) => koder.name === newKoderName
+    const formData = new FormData(e.target);
+    const name = formData.get(form.name.inputName);
+    const email = formData.get(form.email.inputName);
+    const emailConfirmation = formData.get(form.emailConfirmation.inputName);
+    const nameHasErrors = form.name.hasErrors(name);
+    const emailHasErrors = form.email.hasErrors(email);
+    const emailConfirmationHasErrors = form.emailConfirmation.hasErrors(
+      emailConfirmation,
+      email
     );
 
-    const nameIsValid = newKoderName !== "" && !nameAlreadyExists;
-    const isValidEmail = emailRegexPattern.test(newKoderEmail);
-
-    if (!nameIsValid) {
-      setError("Name already in list or name is empty");
-      return;
+    if (nameHasErrors) {
+      return setError("Name is already in list or empty");
     }
 
-    if (!isValidEmail) {
-      setError("Input is not a valid email");
-      return;
+    if (emailHasErrors) {
+      return setError("Email input not valid");
     }
 
-    setError();
+    if (emailConfirmationHasErrors) {
+      return setError("Emails do not match");
+    }
 
-    setKoders([...koders, { name: newKoderName }]);
-  };
+    setError("");
 
-  const handleNewNameChange = (e) => {
-    const newName = e.target.value;
-    setNewKoderName(newName);
+    setKoders([...koders, { name, email }]);
   };
-  const handleNewEmailChange = (e) => {
-    const newEmail = e.target.value;
-    setNewKoderEmail(newEmail);
-  };
-  // const handleNewEmailConfirmationChange = (e) => {
-  //   const newEmailConfirmation = e.target.value;
-  //   setNewKoderName(newEmailConfirmation);
-  // };
 
   const deleteKoder = (name) => {
     setKoders(koders.filter((koder) => koder.name !== name));
@@ -85,26 +101,16 @@ function App() {
         >
           <label className="flex justify-between">
             Nombre
-            <input
-              name="name"
-              type="text"
-              value={newKoderName}
-              onChange={(event) => handleNewNameChange(event)}
-            />
+            <input name={form.name.inputName} type="text" />
           </label>
           <label className="flex justify-between">
             Correo
-            <input
-              name="email"
-              type="text"
-              value={newKoderEmail}
-              onChange={(event) => handleNewEmailChange(event)}
-            />
+            <input name={form.email.inputName} type="text" />
           </label>
-          {/* <label className="flex justify-between">
+          <label className="flex justify-between">
             Confirmar correo
-            <input name="confirm-email" type="text" />
-          </label> */}
+            <input name={form.emailConfirmation.inputName} type="text" />
+          </label>
           {/* <label className="flex justify-between">
             Edad
             <input name="age" type="number" />
