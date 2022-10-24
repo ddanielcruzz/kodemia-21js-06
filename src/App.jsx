@@ -27,6 +27,16 @@ function App() {
 
   const addNewKoder = (e) => {
     e.preventDefault();
+    setKoders([...koders, { name: newKoderName }]);
+  };
+
+  const handleNewNameChange = (e) => {
+    const newName = e.target.value;
+    setNewKoderName(newName);
+  };
+
+  const deleteKoder = (name) => {
+    setKoders(koders.filter((koder) => koder.name !== name));
   };
 
   return (
@@ -38,7 +48,12 @@ function App() {
         >
           <label className="flex justify-between">
             Nombre
-            <input name="name" type="text" />
+            <input
+              name="name"
+              type="text"
+              value={newKoderName}
+              onChange={(event) => handleNewNameChange(event)}
+            />
           </label>
           {/* <label className="flex justify-between">
             Correo
@@ -67,12 +82,20 @@ function App() {
           />
         </form>
         <ul className="flex flex-col space-y-5 text-left">
-          {koders.map(({ name, email, age, generation }) => (
-            <li key={name}>
+          {koders.map(({ name, email, age, generation }, index) => (
+            <li key={index}>
               <article className="bg-white rounded-lg shadow px-4 py-3">
-                <p>
-                  <span className="font-bold">Nombre:</span> {name}
-                </p>
+                <section className="flex justify-between">
+                  <p>
+                    <span className="font-bold">Nombre:</span> {name}
+                  </p>
+                  <button
+                    className="ml-4 cursor-pointer"
+                    onClick={() => deleteKoder(name)}
+                  >
+                    X
+                  </button>
+                </section>
                 {/* <p>
                   <span className="font-bold"> Correo:</span> {email}
                 </p>
