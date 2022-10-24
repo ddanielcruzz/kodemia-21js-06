@@ -1,21 +1,22 @@
 import React, { useState } from "react";
+const emailRegexPattern = new RegExp(/^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/);
 
 const initialKoders = [
   {
     name: "Rodrigo",
-    // email: "rodrgio@kodemia.com",
+    email: "rodrgio@kodemia.com",
     // age: 20,
     // generation: 21,
   },
   {
     name: "Emanuel",
-    // email: "emanuel@kodemia.com",
+    email: "emanuel@kodemia.com",
     // age: 20,
     // generation: 21,
   },
   {
     name: "Héctor",
-    // email: "hector@kodemia.com",
+    email: "hector@kodemia.com",
     // age: 20,
     // generation: 21,
   },
@@ -24,6 +25,9 @@ const initialKoders = [
 function App() {
   const [koders, setKoders] = useState(initialKoders);
   const [newKoderName, setNewKoderName] = useState("");
+  const [newKoderEmail, setNewKoderEmail] = useState("");
+  // const [newKoderEmailConfirmation, setNewKoderEmailConfirmation] =
+  //   useState("");
   const [error, setError] = useState("");
 
   const addNewKoder = (e) => {
@@ -32,12 +36,20 @@ function App() {
       (koder) => koder.name === newKoderName
     );
 
-    if (nameAlreadyExists) {
-      setError("Name already in list");
+    const nameIsValid = newKoderName !== "" && !nameAlreadyExists;
+    const isValidEmail = emailRegexPattern.test(newKoderEmail);
+
+    if (!nameIsValid) {
+      setError("Name already in list or name is empty");
       return;
-    } else {
-      setError();
     }
+
+    if (!isValidEmail) {
+      setError("Input is not a valid email");
+      return;
+    }
+
+    setError();
 
     setKoders([...koders, { name: newKoderName }]);
   };
@@ -46,6 +58,14 @@ function App() {
     const newName = e.target.value;
     setNewKoderName(newName);
   };
+  const handleNewEmailChange = (e) => {
+    const newEmail = e.target.value;
+    setNewKoderEmail(newEmail);
+  };
+  // const handleNewEmailConfirmationChange = (e) => {
+  //   const newEmailConfirmation = e.target.value;
+  //   setNewKoderName(newEmailConfirmation);
+  // };
 
   const deleteKoder = (name) => {
     setKoders(koders.filter((koder) => koder.name !== name));
@@ -72,15 +92,20 @@ function App() {
               onChange={(event) => handleNewNameChange(event)}
             />
           </label>
-          {/* <label className="flex justify-between">
-            Correo
-            <input name="email" type="text" />
-          </label>
           <label className="flex justify-between">
+            Correo
+            <input
+              name="email"
+              type="text"
+              value={newKoderEmail}
+              onChange={(event) => handleNewEmailChange(event)}
+            />
+          </label>
+          {/* <label className="flex justify-between">
             Confirmar correo
             <input name="confirm-email" type="text" />
-          </label>
-          <label className="flex justify-between">
+          </label> */}
+          {/* <label className="flex justify-between">
             Edad
             <input name="age" type="number" />
           </label>
@@ -113,10 +138,10 @@ function App() {
                     X
                   </button>
                 </section>
-                {/* <p>
+                <p>
                   <span className="font-bold"> Correo:</span> {email}
                 </p>
-                <p>
+                {/* <p>
                   <span className="font-bold">Edad:</span> {age}
                 </p>
                 <p>
